@@ -23,6 +23,7 @@ class DockerManager:
         self.container = None
         self.delete_image = delete_image
         self.build_logs: List[str] = []
+        self.patch_logs: List[str] = []
         self.run_logs: List[str] = []
         self.ghcr_image_name = None
 
@@ -198,6 +199,7 @@ class DockerManager:
                 workdir=workdir,
                 user="root",
             )
+            self.patch_logs.append(exec_result.output.decode())
             if exec_result.exit_code != 0:
                 # Second try: patch command
                 exec_result = self.container.exec_run(
@@ -205,6 +207,7 @@ class DockerManager:
                     workdir=workdir,
                     user="root",
                 )
+                self.patch_logs.append(exec_result.output.decode())
                 if exec_result.exit_code != 0:
                     raise ValueError("Failed to apply patch.")
                 else:

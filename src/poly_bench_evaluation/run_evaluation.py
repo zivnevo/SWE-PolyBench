@@ -201,6 +201,15 @@ def evaluate_instance(
     except Exception:
         patch_success = 1
         logger.debug(f"patch error for instance id: {instance_id}")
+        docker_manager.patch_logs.append("Failed to apply code patch")
+
+
+    run_logs_string = "\n".join(docker_manager.patch_logs)
+    run_logs_path = Path(f"./patch_logs_{language.lower()}")
+    run_logs_path.mkdir(exist_ok=True)
+
+    with open(str(run_logs_path) + f"/{instance_id}_patch.log", "w") as f:
+        f.write(run_logs_string)
 
     if patch_success != 0:
         logger.info(f"patch apply error for instance id: {instance_id}")
